@@ -3661,7 +3661,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>124</stockCount>
+                        <stockCount>123</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -3672,7 +3672,7 @@
         <cat1name>Müzik Aletleri Aksesuarları</cat1name>
         <cat1code>611e9c3d-a711-4685-9713-b851ab5727a1</cat1code>
         <category_path>Müzik Aletleri Aksesuarları</category_path>
-        <stock>124</stock>
+        <stock>123</stock>
     </product>
     <product>
         <id>fa682013-ff11-48b5-9da1-ba5f201d6f08</id>
@@ -10116,7 +10116,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>696</stockCount>
+                        <stockCount>694</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -10127,7 +10127,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>696</stock>
+        <stock>694</stock>
     </product>
     <product>
         <id>1109297a-2415-4332-99b8-4b885560821c</id>
@@ -18342,7 +18342,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>179</stockCount>
+                        <stockCount>178</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -18353,7 +18353,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>179</stock>
+        <stock>178</stock>
     </product>
     <product>
         <id>e3f8213b-b3a2-474f-98a2-2f57d23aa002</id>
@@ -18878,7 +18878,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>3920</stockCount>
+                        <stockCount>3915</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -18889,7 +18889,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>3920</stock>
+        <stock>3915</stock>
     </product>
     <product>
         <id>3e175f32-40d8-40c8-8c6c-3bb96a49ea54</id>
@@ -19556,7 +19556,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>418</stockCount>
+                        <stockCount>416</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -19567,7 +19567,7 @@
         <cat1name>Ritim Aletleri</cat1name>
         <cat1code>0686e525-3fc5-48a0-8392-e8c43f1c649b</cat1code>
         <category_path>Ritim Aletleri</category_path>
-        <stock>418</stock>
+        <stock>416</stock>
     </product>
     <product>
         <id>6921cf55-a881-4628-81de-0eaa1d1dcf92</id>
@@ -23252,7 +23252,7 @@
                 </images>
                 <prices>
                     <price>
-                        <sellPrice>198.66</sellPrice>
+                        <sellPrice>240</sellPrice>
                         <buyPrice>0</buyPrice>
                         <discountPrice/>
                         <currency>TRY</currency>
@@ -23261,7 +23261,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>153</stockCount>
+                        <stockCount>149</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -23272,7 +23272,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>153</stock>
+        <stock>149</stock>
     </product>
     <product>
         <id>fb1ba446-4bb5-4961-b88d-b79b8e380105</id>
@@ -23775,7 +23775,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>4300</stockCount>
+                        <stockCount>4295</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -23786,7 +23786,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>4300</stock>
+        <stock>4295</stock>
     </product>
     <product>
         <id>4dd039b4-1d6d-421d-be33-aabf594a2b8d</id>
@@ -25093,7 +25093,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>710</stockCount>
+                        <stockCount>708</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -25104,7 +25104,7 @@
         <cat1name>Nefesli Müzik Aletleri</cat1name>
         <cat1code>047f10fa-7d70-4052-a246-b9a9cc8de249</cat1code>
         <category_path>Nefesli Müzik Aletleri</category_path>
-        <stock>710</stock>
+        <stock>708</stock>
     </product>
     <product>
         <id>5dd871aa-fe30-4cae-b5bb-d399ecc74928</id>
@@ -25233,7 +25233,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>100</stockCount>
+                        <stockCount>99</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -25244,7 +25244,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>100</stock>
+        <stock>99</stock>
     </product>
     <product>
         <id>5c4f6d52-617f-46f0-9a80-c62ecf582618</id>
@@ -25303,7 +25303,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>199</stockCount>
+                        <stockCount>198</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -25314,7 +25314,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>199</stock>
+        <stock>198</stock>
     </product>
     <product>
         <id>626041d7-374d-4268-997a-a6d67008876b</id>
@@ -25373,7 +25373,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>199</stockCount>
+                        <stockCount>198</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -25384,7 +25384,7 @@
         <cat1name>Ürünler</cat1name>
         <cat1code>5c8dc5e7-8d04-4016-a28f-c4133e9129b5</cat1code>
         <category_path>Ürünler</category_path>
-        <stock>199</stock>
+        <stock>198</stock>
     </product>
     <product>
         <id>e6288775-4a65-47b9-8a3f-126c2e57350c</id>
@@ -27537,7 +27537,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>1547</stockCount>
+                        <stockCount>1542</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -27548,7 +27548,7 @@
         <cat1name>Ritim Aletleri</cat1name>
         <cat1code>0686e525-3fc5-48a0-8392-e8c43f1c649b</cat1code>
         <category_path>Ritim Aletleri</category_path>
-        <stock>1547</stock>
+        <stock>1542</stock>
     </product>
     <product>
         <id>a8de6c91-555c-454f-a344-7c2829f34aff</id>
@@ -31453,7 +31453,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>1765</stockCount>
+                        <stockCount>1760</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -31464,7 +31464,7 @@
         <cat1name>Ritim Aletleri</cat1name>
         <cat1code>0686e525-3fc5-48a0-8392-e8c43f1c649b</cat1code>
         <category_path>Ritim Aletleri</category_path>
-        <stock>1765</stock>
+        <stock>1760</stock>
     </product>
     <product>
         <id>c943c7b5-4047-4378-9ae1-58f701061415</id>
@@ -34657,7 +34657,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>845</stockCount>
+                        <stockCount>843</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -34668,7 +34668,7 @@
         <cat1name>Yaylı Müzik Aletleri</cat1name>
         <cat1code>712bf320-deb7-4a38-84a3-acde70c67eed</cat1code>
         <category_path>Yaylı Müzik Aletleri</category_path>
-        <stock>845</stock>
+        <stock>843</stock>
     </product>
     <product>
         <id>40a7763d-74b6-49b5-9bf4-14e916c13beb</id>
@@ -35960,7 +35960,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>66</stockCount>
+                        <stockCount>41</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -35971,7 +35971,7 @@
         <cat1name>Ritim Aletleri</cat1name>
         <cat1code>0686e525-3fc5-48a0-8392-e8c43f1c649b</cat1code>
         <category_path>Ritim Aletleri</category_path>
-        <stock>66</stock>
+        <stock>41</stock>
     </product>
     <product>
         <id>5495983d-194d-40f1-bcce-1be296f6ef50</id>
@@ -38741,7 +38741,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>1344</stockCount>
+                        <stockCount>1339</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -38752,7 +38752,7 @@
         <cat1name>Ritim Aletleri</cat1name>
         <cat1code>0686e525-3fc5-48a0-8392-e8c43f1c649b</cat1code>
         <category_path>Ritim Aletleri</category_path>
-        <stock>1344</stock>
+        <stock>1339</stock>
     </product>
     <product>
         <id>2fcf0517-7ee5-49ef-be23-a1b7665aa6cc</id>
@@ -38821,7 +38821,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>294</stockCount>
+                        <stockCount>293</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -38832,7 +38832,7 @@
         <cat1name>Ritim Aletleri</cat1name>
         <cat1code>0686e525-3fc5-48a0-8392-e8c43f1c649b</cat1code>
         <category_path>Ritim Aletleri</category_path>
-        <stock>294</stock>
+        <stock>293</stock>
     </product>
     <product>
         <id>efd441a4-faa5-400c-8304-a125aea80ed8</id>
@@ -38900,7 +38900,7 @@
                 <stocks>
                     <stock>
                         <stockLocationName>Ana Depo</stockLocationName>
-                        <stockCount>15</stockCount>
+                        <stockCount>14</stockCount>
                     </stock>
                 </stocks>
                 <variantValues/>
@@ -38911,6 +38911,6 @@
         <cat1name>Ritim Aletleri</cat1name>
         <cat1code>0686e525-3fc5-48a0-8392-e8c43f1c649b</cat1code>
         <category_path>Ritim Aletleri</category_path>
-        <stock>15</stock>
+        <stock>14</stock>
     </product>
 </products>

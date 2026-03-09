@@ -34,8 +34,6 @@ const products = Array.isArray(xml.products?.product)
     ? xml.products.product
     : [xml.product].filter(Boolean);
 
-console.log(`📦 Total products in XML: ${products.length}`);
-
 // DB SELECT
 const selectStmt = db.prepare(`
   SELECT buy_price, sale_price, stock, currency
@@ -72,7 +70,6 @@ const transaction = db.transaction(() => {
         for (const v of variants) {
             const sku = normalize(v.sku);
             if (!sku) {
-                console.warn("⚠️  SKU missing, skipping variant");
                 continue;
             }
 
@@ -84,8 +81,6 @@ const transaction = db.transaction(() => {
             const buy_price = num(priceData?.sellPrice);
 
             if (!buy_price) {
-                console.warn(`⚠️  ${sku}: No price found in XML`);
-                console.log(`   Raw price data:`, JSON.stringify(priceData, null, 2));
                 errors++;
                 continue;
             }
@@ -104,7 +99,6 @@ const transaction = db.transaction(() => {
             const current = selectStmt.get(sku);
 
             if (!current) {
-                console.log(`❌ ${sku}: Not found in DB`);
                 notFound++;
                 continue;
             }
@@ -126,10 +120,8 @@ const transaction = db.transaction(() => {
                 `${now()} | ${sku} | ` +
                 `BUY: ${current.buy_price}→${buy_price} | ` +
                 `SALE: ${current.sale_price}→${sale_price} | ` +
-                `STOCK: ${current.stock}→${stock} | ` +
-                `CURRENCY: ${current.currency}→${currency}`;
+                `STOCK: ${current.stock}→${stock}`;
 
-            console.log("✅ UPDATED →", line);
             log(line);
             updated++;
         }
@@ -138,10 +130,13 @@ const transaction = db.transaction(() => {
 
 transaction();
 
-console.log("\n────────────────────────");
-console.log("✅ Updated:", updated);
-console.log("⏭️  Unchanged:", skipped);
-console.log("❌ Not Found:", notFound);
-console.log("⚠️  Errors:", errors);
 console.log("────────────────────────");
-console.log("✅ MACOM senkron tamamlandı");
+console.log(`✅ MACOM senkron tamamlandı`);
+console.log(`📊 Güncellenen: ${updated}`);
+console.log(`⏭️  Değişmeyen: ${skipped}`);
+if (notFound > 0) {
+    console.log(`⚠️  DB'de bulunamayan: ${notFound}`);
+}
+if (errors > 0) {
+    console.log(`❌ Hatalı: ${errors}`);
+}

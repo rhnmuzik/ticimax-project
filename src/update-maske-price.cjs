@@ -131,9 +131,7 @@ const transaction = db.transaction(() => {
             `PRICE: ${current.sale_price}→${salePrice} | ` +
             `CUR: ${current.currency}→${currency}`;
 
-        console.log("UPDATED →", line);
         log(line);
-
         updated++;
     }
 });
@@ -141,8 +139,12 @@ const transaction = db.transaction(() => {
 transaction();
 
 console.log("────────────────────────");
-console.log("Updated:", updated);
-console.log("Unchanged:", skipped);
-console.log("Not Found:", notFound);
-console.log("TRY → USD Converted:", converted);
-console.log("✅ MASKE senkron tamamlandı (stock hariç)");
+console.log(`✅ MASKE senkron tamamlandı`);
+console.log(`📊 Güncellenen: ${updated}`);
+console.log(`⏭️  Değişmeyen: ${skipped}`);
+if (notFound > 0) {
+    console.log(`⚠️  DB'de bulunamayan: ${notFound}`);
+}
+if (converted > 0) {
+    console.log(`💱 TRY→USD dönüşüm: ${converted}`);
+}

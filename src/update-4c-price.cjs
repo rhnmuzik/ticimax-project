@@ -136,9 +136,7 @@ const transaction = db.transaction(() => {
             `Price: ${current.sale_price}→${i.sale_price} | ` +
             `Stock: ${current.stock}→${i.stock}`;
 
-        console.log("UPDATED →", logLine);
         log(logLine);
-
         updated++;
     }
 });
@@ -149,7 +147,9 @@ transaction();
 // SUMMARY
 // ====================
 console.log("────────────────────────");
-console.log("Updated:", updated);
-console.log("Unchanged:", skipped);
-console.log("Not Found in DB:", notFound);
-console.log("✅ 4C senkron tamamlandı");
+console.log(`✅ 4C senkron tamamlandı`);
+console.log(`📊 Güncellenen: ${updated}`);
+console.log(`⏭️  Değişmeyen: ${skipped}`);
+if (notFound > 0) {
+    console.log(`⚠️  DB'de bulunamayan: ${notFound}`);
+}

@@ -1,4 +1,7 @@
-const { execSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+const https = require("https");
+const http = require("http");
 
 const urls = {
     "../data/4c.xml":
@@ -9,9 +12,50 @@ const urls = {
         "https://www.maskemuzik.com/TicimaxXmlV2/6DFAD0D36ED64FA29794EA44D5DD4D68/"
 };
 
-for (const file in urls) {
-    console.log("⬇️", file);
-    execSync(`curl -L -o ${file} "${urls[file]}"`, { stdio: "inherit" });
+async function downloadFile(url, filePath) {
+    return new Promise((resolve, reject) => {
+        const protocol = url.startsWith("https") ? https : http;
+        const fullPath = path.resolve(__dirname, filePath);
+        const dir = path.dirname(fullPath);
+
+        // Klasör yoksa oluştur
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        const file = fs.createWriteStream(fullPath);
+
+        protocol.get(url, { timeout: 30000 }, (response) => {
+            if (response.statusCode !== 200) {
+                reject(new Error(`HTTP ${response.statusCode}: ${url}`));
+                return;
+            }
+
+            response.pipe(file);
+
+            file.on("finish", () => {
+                file.close();
+                resolve();
+            });
+        }).on("error", (err) => {
+            fs.unlink(fullPath, () => { }); // Hatalı dosyayı sil
+            reject(err);
+        });
+    });
 }
 
-console.log("✅ Tüm XML'ler indirildi");
+async function main() {
+    try {
+        for (const [file, url] of Object.entries(urls)) {
+            console.log(`⬇️  İndiriliyor: ${file}`);
+            await downloadFile(url, file);
+            console.log(`✅ İndirildi: ${file}`);
+        }
+        console.log("\n✅ Tüm XML'ler başarıyla indirildi");
+    } catch (error) {
+        console.error(`❌ Hata: ${error.message}`);
+        process.exit(1);
+    }
+}
+
+main();

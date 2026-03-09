@@ -51,6 +51,25 @@ const normalizeBarcode = v => {
     return s.replace(/\.0$/, "");
 };
 
+const normalizeMarketplaceStatus = v => {
+    if (!v) return null;
+
+    const s = String(v || "").toLowerCase().trim();
+
+    // "null" string'ini null'a çevir
+    if (s === "null" || s === "") return null;
+
+    // Marketplace adlarını normalize et
+    if (s.includes("hb") || s.includes("hepsiburada")) return "hb";
+    if (s.includes("n11")) return "n11";
+    if (s.includes("trendyol")) return "trendyol";
+    if (s.includes("4c")) return "4c";
+    if (s.includes("macom")) return "macom";
+    if (s.includes("maske")) return "maske";
+
+    return s || null;
+};
+
 // ---------------- UPSERT ----------------
 
 const upsert = db.prepare(`
@@ -111,10 +130,12 @@ const setStatus = db.prepare(`
     });
 
     const excelVariantIds = new Set();
+    let processedCount = 0;
+    let nullMarketplaceCount = 0;
 
     const transaction = db.transaction(() => {
 
-        // 1️⃣ Excel’i oku ve upsert et
+        // 1️⃣ Excel'i oku ve upsert et
         sheet.eachRow((row, rowNo) => {
             if (rowNo === 1) return;
 
@@ -131,7 +152,17 @@ const setStatus = db.prepare(`
             const barcode = normalizeBarcode(
                 row.getCell(col["BARKOD"]).value
             );
+
+            const marketplaceStatus = normalizeMarketplaceStatus(
+                row.getCell(col["PAZARYERIAKTIFLISTESI"]).value
+            );
+
             excelVariantIds.add(variantId);
+            processedCount++;
+
+            if (!marketplaceStatus) {
+                nullMarketplaceCount++;
+            }
 
             upsert.run(
                 sku,
@@ -170,5 +201,7 @@ const setStatus = db.prepare(`
 
     console.log("────────────────────────");
     console.log("✅ Excel senkron tamamlandı");
+    console.log(`📊 İşlenen ürün: ${processedCount}`);
+    console.log(`⚠️  Null marketplace: ${nullMarketplaceCount}`);
     console.log("🔄 Status alanı otomatik düzeltildi");
 })();
