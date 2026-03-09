@@ -217,6 +217,49 @@ app.get("/scripts", (req, res) => {
     }
 });
 
+// GET /download-changes-excel  → değişiklik Excel'ini indir
+app.get("/download-changes-excel", (req, res) => {
+    try {
+        const filePath = path.resolve(__dirname, "../data/ticimax-import/ticimax-changes.xlsx");
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ ok: false, error: "Dosya bulunamadı. Önce Excel oluşturun." });
+        }
+
+        log("GET", "/download-changes-excel", 200);
+        res.download(filePath, "ticimax-changes.xlsx");
+    } catch (e) {
+        log("GET", "/download-changes-excel", 500);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
+// GET /last-import-time  → son import zamanını al
+app.get("/last-import-time", (req, res) => {
+    try {
+        const Database = require("better-sqlite3");
+        const dbPath = path.resolve(__dirname, "../data/core.db");
+        const db = new Database(dbPath);
+
+        const result = db.prepare(`
+            SELECT MAX(updated_at) as last_import
+            FROM products
+            WHERE status = 'active'
+        `).get();
+
+        db.close();
+
+        log("GET", "/last-import-time", 200);
+        res.json({
+            ok: true,
+            lastImport: result?.last_import || null
+        });
+    } catch (e) {
+        log("GET", "/last-import-time", 500);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
 // POST /scripts/:name/run  → script'i çalıştır
 app.post("/scripts/:name/run", async (req, res) => {
     const { name } = req.params;

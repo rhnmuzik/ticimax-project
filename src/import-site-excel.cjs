@@ -104,7 +104,13 @@ const upsert = db.prepare(`
     vat_included  = excluded.vat_included,
     barcode       = excluded.barcode,
     status        = 'active',
-    updated_at    = CURRENT_TIMESTAMP
+    updated_at    = CASE
+      WHEN stock != excluded.stock 
+        OR buy_price != excluded.buy_price 
+        OR sale_price != excluded.sale_price
+      THEN CURRENT_TIMESTAMP
+      ELSE updated_at
+    END
 `);
 
 const setStatus = db.prepare(`
@@ -112,6 +118,7 @@ const setStatus = db.prepare(`
   SET status = ?,
       updated_at = CURRENT_TIMESTAMP
   WHERE variant_id = ?
+  AND status != ?
 `);
 
 // ---------------- MAIN ----------------
@@ -182,16 +189,16 @@ const setStatus = db.prepare(`
 
         // 2️⃣ DB'deki tüm ürünleri kontrol et
         const dbRows = db.prepare(`
-      SELECT variant_id FROM products
+      SELECT variant_id, status FROM products
     `).all();
 
         for (const r of dbRows) {
             const dbVariant = normalizeVariantId(r.variant_id);
 
             if (excelVariantIds.has(dbVariant)) {
-                setStatus.run('active', dbVariant);
+                setStatus.run('active', dbVariant, 'active');
             } else {
-                setStatus.run('removed', dbVariant);
+                setStatus.run('removed', dbVariant, 'removed');
             }
         }
 
