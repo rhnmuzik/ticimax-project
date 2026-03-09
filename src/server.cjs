@@ -234,6 +234,24 @@ app.get("/download-changes-excel", (req, res) => {
     }
 });
 
+// GET /download-new-products-excel/:filename  → yeni ürün Excel'ini indir
+app.get("/download-new-products-excel/:filename", (req, res) => {
+    try {
+        const { filename } = req.params;
+        const filePath = path.resolve(__dirname, `../data/ticimax-import/${filename}`);
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ ok: false, error: "Dosya bulunamadı" });
+        }
+
+        log("GET", `/download-new-products-excel/${filename}`, 200);
+        res.download(filePath, filename);
+    } catch (e) {
+        log("GET", "/download-new-products-excel", 500);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
 // GET /last-import-time  → son import zamanını al
 app.get("/last-import-time", (req, res) => {
     try {
@@ -256,6 +274,302 @@ app.get("/last-import-time", (req, res) => {
         });
     } catch (e) {
         log("GET", "/last-import-time", 500);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
+// GET /discover/new-products  → XML'de olup DB'de olmayan ürünleri listele
+app.get("/discover/new-products", (req, res) => {
+    try {
+        const Database = require("better-sqlite3");
+        const { XMLParser } = require("fast-xml-parser");
+        const dbPath = path.resolve(__dirname, "../data/core.db");
+        const db = new Database(dbPath);
+
+        const newProducts = [];
+        const parser = new XMLParser({ ignoreAttributes: false });
+
+        // 4c ve maske (Ticimax formatı)
+        const ticimaxFiles = [
+            { name: '4c', path: path.resolve(__dirname, "../data/4c.xml") },
+            { name: 'maske', path: path.resolve(__dirname, "../data/maske.xml") },
+        ];
+
+        for (const xmlFile of ticimaxFiles) {
+            if (!fs.existsSync(xmlFile.path)) continue;
+
+            const xmlContent = fs.readFileSync(xmlFile.path, 'utf8');
+            const xml = parser.parse(xmlContent);
+            const urunler = xml?.Root?.Urunler?.Urun || [];
+            const urunArray = Array.isArray(urunler) ? urunler : [urunler];
+
+            for (const urun of urunArray) {
+                const secenekler = urun?.UrunSecenek?.Secenek;
+                if (!secenekler) continue;
+
+                const secenekArray = Array.isArray(secenekler) ? secenekler : [secenekler];
+
+                for (const secenek of secenekArray) {
+                    const sku = String(secenek.StokKodu || '').trim().toUpperCase();
+                    if (!sku) continue;
+
+                    const exists = db.prepare(`
+                        SELECT 1 FROM products WHERE sku = ? LIMIT 1
+                    `).get(sku);
+
+                    if (!exists) {
+                        newProducts.push({
+                            supplier: xmlFile.name,
+                            sku: secenek.StokKodu,
+                            name: urun.UrunAdi,
+                            category: urun.KategoriTree || urun.Kategori,
+                            price: secenek.SatisFiyati,
+                            stock: secenek.StokAdedi || 0,
+                            currency: secenek.ParaBirimiKodu || secenek.ParaBirimi,
+                        });
+                    }
+                }
+            }
+        }
+
+        // macom (ikas formatı)
+        const macomPath = path.resolve(__dirname, "../data/macom.xml");
+        if (fs.existsSync(macomPath)) {
+            const xmlContent = fs.readFileSync(macomPath, 'utf8');
+            const xml = parser.parse(xmlContent);
+            const products = xml?.products?.product || [];
+            const productArray = Array.isArray(products) ? products : [products];
+
+            for (const product of productArray) {
+                const variants = product?.variants?.variant || [];
+                const variantArray = Array.isArray(variants) ? variants : [variants];
+
+                for (const variant of variantArray) {
+                    const sku = String(variant.sku || '').trim().toUpperCase();
+                    if (!sku) continue;
+
+                    const exists = db.prepare(`
+                        SELECT 1 FROM products WHERE sku = ? LIMIT 1
+                    `).get(sku);
+
+                    if (!exists) {
+                        // Fiyat bilgisi prices/price içinde
+                        const pricesObj = variant?.prices?.price;
+                        const price = pricesObj?.sellPrice || pricesObj?.buyPrice || 0;
+                        const currency = pricesObj?.currency || 'TRY';
+
+                        // Stok bilgisi stocks/stock içinde
+                        const stocksObj = variant?.stocks?.stock;
+                        const stock = stocksObj?.stockCount || 0;
+
+                        newProducts.push({
+                            supplier: 'macom',
+                            sku: variant.sku,
+                            name: product.name,
+                            category: product.tags?.tag?.name || '',
+                            price: price,
+                            stock: stock,
+                            currency: currency,
+                        });
+                    }
+                }
+            }
+        }
+
+        db.close();
+
+        log("GET", "/discover/new-products", 200);
+        res.json({
+            ok: true,
+            count: newProducts.length,
+            products: newProducts
+        });
+    } catch (e) {
+        log("GET", "/discover/new-products", 500);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
+// POST /discover/add-products  → Seçili ürünler için Excel oluştur ve indir
+app.post("/discover/add-products", async (req, res) => {
+    try {
+        const { skus } = req.body;
+        if (!Array.isArray(skus) || skus.length === 0) {
+            return res.status(400).json({ ok: false, error: "SKU listesi gerekli" });
+        }
+
+        const ExcelJS = require("exceljs");
+        const { XMLParser } = require("fast-xml-parser");
+
+        const TEMPLATE_PATH = path.resolve(__dirname, "../data/ticimax-import/ticimax-template.xlsx");
+
+        // Timestamp ile dosya adı
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-").split("T")[0];
+        const OUTPUT_FILENAME = `new-products-${timestamp}.xlsx`;
+        const OUTPUT_PATH = path.resolve(__dirname, `../data/ticimax-import/${OUTPUT_FILENAME}`);
+
+        // Normalize SKUs
+        const skuList = skus.map(s => String(s).trim().toUpperCase());
+
+        // XML'leri oku ve ürünleri bul
+        const parser = new XMLParser({ ignoreAttributes: false });
+        const products = [];
+
+        // 4c ve maske (Ticimax formatı)
+        const ticimaxFiles = [
+            { name: '4c', path: path.resolve(__dirname, "../data/4c.xml") },
+            { name: 'maske', path: path.resolve(__dirname, "../data/maske.xml") },
+        ];
+
+        for (const xmlFile of ticimaxFiles) {
+            if (!fs.existsSync(xmlFile.path)) continue;
+
+            const xmlContent = fs.readFileSync(xmlFile.path, 'utf8');
+            const xml = parser.parse(xmlContent);
+            const urunler = xml?.Root?.Urunler?.Urun || [];
+            const urunArray = Array.isArray(urunler) ? urunler : [urunler];
+
+            for (const urun of urunArray) {
+                const secenekler = urun?.UrunSecenek?.Secenek;
+                if (!secenekler) continue;
+
+                const secenekArray = Array.isArray(secenekler) ? secenekler : [secenekler];
+
+                for (const secenek of secenekArray) {
+                    const sku = String(secenek.StokKodu || '').trim().toUpperCase();
+                    if (skuList.includes(sku)) {
+                        products.push({
+                            supplier: xmlFile.name,
+                            sku: secenek.StokKodu,
+                            name: urun.UrunAdi,
+                            description: urun.Aciklama || '',
+                            brand: urun.Marka,
+                            category: urun.KategoriTree || urun.Kategori,
+                            price: secenek.SatisFiyati,
+                            stock: secenek.StokAdedi || 0,
+                            currency: secenek.ParaBirimiKodu || secenek.ParaBirimi,
+                        });
+                    }
+                }
+            }
+        }
+
+        // macom (ikas formatı) - Ticimax formatına dönüştür
+        const macomPath = path.resolve(__dirname, "../data/macom.xml");
+        if (fs.existsSync(macomPath)) {
+            const xmlContent = fs.readFileSync(macomPath, 'utf8');
+            const xml = parser.parse(xmlContent);
+            const macomProducts = xml?.products?.product || [];
+            const productArray = Array.isArray(macomProducts) ? macomProducts : [macomProducts];
+
+            for (const product of productArray) {
+                const variants = product?.variants?.variant || [];
+                const variantArray = Array.isArray(variants) ? variants : [variants];
+
+                for (const variant of variantArray) {
+                    const sku = String(variant.sku || '').trim().toUpperCase();
+                    if (skuList.includes(sku)) {
+                        const pricesObj = variant?.prices?.price;
+                        const price = pricesObj?.sellPrice || pricesObj?.buyPrice || 0;
+                        const currency = pricesObj?.currency || 'TRY';
+                        const stocksObj = variant?.stocks?.stock;
+                        const stock = stocksObj?.stockCount || 0;
+
+                        products.push({
+                            supplier: 'macom',
+                            sku: variant.sku,
+                            name: product.name,
+                            description: product.description || '',
+                            brand: product.brand?.name || '',
+                            category: product.tags?.tag?.name || '',
+                            price: price,
+                            stock: stock,
+                            currency: currency,
+                        });
+                    }
+                }
+            }
+        }
+
+        if (products.length === 0) {
+            return res.status(404).json({ ok: false, error: "Seçili ürünler XML'de bulunamadı" });
+        }
+
+        // Excel'i oluştur
+        const templateWb = new ExcelJS.Workbook();
+        await templateWb.xlsx.readFile(TEMPLATE_PATH);
+        const templateSheet = templateWb.worksheets[0];
+
+        const outputWb = new ExcelJS.Workbook();
+        const outputSheet = outputWb.addWorksheet("Import");
+
+        // Header'ı kopyala
+        const headerRow = templateSheet.getRow(1);
+        const col = {};
+        headerRow.eachCell((cell, colNumber) => {
+            outputSheet.getCell(1, colNumber).value = cell.value;
+            col[String(cell.value).trim().toUpperCase()] = colNumber;
+        });
+
+        // Barkod generator
+        let barcodeCounter = 1;
+        const generateRhnBarcode = () => {
+            const today = new Date();
+            const yy = String(today.getFullYear()).slice(-2);
+            const mm = String(today.getMonth() + 1).padStart(2, "0");
+            const dd = String(today.getDate()).padStart(2, "0");
+            const prefix = `RHN${yy}${mm}${dd}`;
+            return prefix + String(barcodeCounter++).padStart(4, "0");
+        };
+
+        // Ürünleri ekle
+        let rowIndex = 2;
+        for (const product of products) {
+            const row = outputSheet.getRow(rowIndex);
+
+            row.getCell(col["URUNID"]).value = 0;
+            row.getCell(col["URUNKARTIID"]).value = 0;
+            row.getCell(col["STOKKODU"]).value = product.sku;
+            row.getCell(col["VARYASYONKODU"]).value = product.sku;
+            row.getCell(col["BARKOD"]).value = generateRhnBarcode();
+            row.getCell(col["URUNADI"]).value = product.name;
+
+            if (col["ONYAZI"]) {
+                row.getCell(col["ONYAZI"]).value = product.name;
+            }
+
+            if (col["TEDARIKCI"]) {
+                row.getCell(col["TEDARIKCI"]).value = product.supplier.toUpperCase();
+            }
+
+            row.getCell(col["ACIKLAMA"]).value = product.description;
+            row.getCell(col["MARKA"]).value = product.brand;
+            row.getCell(col["KATEGORILER"]).value = product.category;
+            row.getCell(col["STOKADEDI"]).value = product.stock;
+            row.getCell(col["SATISFIYATI"]).value = product.price;
+            row.getCell(col["KDVORANI"]).value = 20;
+            row.getCell(col["KDVDAHIL"]).value = 1;
+            row.getCell(col["PARABIRIMI"]).value = product.currency;
+            row.getCell(col["URUNAKTIF"]).value = 0;
+
+            row.commit();
+            rowIndex++;
+        }
+
+        await outputWb.xlsx.writeFile(OUTPUT_PATH);
+
+        log("POST", "/discover/add-products", 200);
+        console.log(`✅ Yeni ürün Excel'i oluşturuldu: ${OUTPUT_FILENAME} (${products.length} ürün)`);
+
+        res.json({
+            ok: true,
+            count: products.length,
+            filename: OUTPUT_FILENAME,
+            path: OUTPUT_PATH
+        });
+    } catch (e) {
+        log("POST", "/discover/add-products", 500);
+        console.error(`❌ Excel oluşturma hatası: ${e.message}`);
         res.status(500).json({ ok: false, error: e.message });
     }
 });

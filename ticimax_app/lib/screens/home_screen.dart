@@ -10,6 +10,7 @@ import 'scripts_screen.dart';
 import 'workflows_screen.dart';
 import 'excel_import_screen.dart';
 import 'excel_export_screen.dart';
+import 'discover_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -141,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _lastImportCard(),
             const SizedBox(height: 20),
             const Text(
-              'Hızlı Erişim',
+              'Modüller',
               style: TextStyle(
                 color: Colors.white54,
                 fontSize: 12,
@@ -149,6 +150,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
+            const Text(
+              'Panel',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
             _navCard(
               icon: Icons.terminal_outlined,
               title: 'Scripts',
@@ -159,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => const ScriptsScreen()),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             _navCard(
               icon: Icons.auto_awesome_outlined,
               title: 'Workflows',
@@ -170,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => const WorkflowsScreen()),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             _navCard(
               icon: Icons.file_download_outlined,
               title: 'Excel Import',
@@ -181,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => const ExcelImportScreen()),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             _navCard(
               icon: Icons.file_upload_outlined,
               title: 'Excel Export',
@@ -190,6 +201,27 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const ExcelExportScreen()),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Discover',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _navCard(
+              icon: Icons.search_outlined,
+              title: 'Yeni Ürünler',
+              sub: 'XML\'de olup sistemde olmayan ürünleri keşfet',
+              color: const Color(0xFF00C896),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DiscoverScreen()),
               ),
             ),
           ],

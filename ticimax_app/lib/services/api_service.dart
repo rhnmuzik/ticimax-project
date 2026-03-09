@@ -3,7 +3,9 @@
 // Server URL'i ayarlardan okunur; aynı Wi-Fi'da olmak gerekir.
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/order.dart';
 import '../models/product.dart';
@@ -169,6 +171,62 @@ class ApiService {
       return {'ok': res['ok'] ?? false, 'lastImport': res['lastImport']};
     } catch (e) {
       return {'ok': false, 'lastImport': null};
+    }
+  }
+
+  // ── Discover ──────────────────────────────────────────
+  Future<Map<String, dynamic>> getNewProducts() async {
+    try {
+      print('Fetching new products from API...');
+      final res = await _get('/discover/new-products');
+      print('API response: ok=${res['ok']}, count=${res['count']}');
+      return {
+        'ok': res['ok'] ?? false,
+        'count': res['count'] ?? 0,
+        'products': res['products'] ?? [],
+      };
+    } catch (e) {
+      print('Error fetching new products: $e');
+      return {'ok': false, 'count': 0, 'products': [], 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> addNewProducts(List<String> skus) async {
+    try {
+      print('Adding ${skus.length} products...');
+      final res = await _post('/discover/add-products', {'skus': skus});
+      print('Add products response: ok=${res['ok']}, count=${res['count']}');
+      return {
+        'ok': res['ok'] ?? false,
+        'count': res['count'] ?? 0,
+        'filename': res['filename'],
+        'path': res['path'],
+      };
+    } catch (e) {
+      print('Error adding products: $e');
+      return {'ok': false, 'count': 0, 'error': e.toString()};
+    }
+  }
+
+  Future<String> downloadNewProductsExcel(String filename) async {
+    try {
+      final base = await getBaseUrl();
+      final url = '$base/download-new-products-excel/$filename';
+
+      final res = await http.get(Uri.parse(url));
+
+      if (res.statusCode == 200) {
+        // Dosyayı kaydet
+        final dir = await getApplicationDocumentsDirectory();
+        final filePath = '${dir.path}/$filename';
+        final file = File(filePath);
+        await file.writeAsBytes(res.bodyBytes);
+        return filePath;
+      } else {
+        throw Exception('Download failed: ${res.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Download error: $e');
     }
   }
 }
